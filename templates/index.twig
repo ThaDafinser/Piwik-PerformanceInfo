@@ -1,0 +1,96 @@
+{% extends 'admin.twig' %}
+
+{% block content %}
+
+    <h2>Performance and config information</h2>
+    
+    <h3>Config paths</h3>
+    <table class="dataTable entityTable">
+        <tr>
+            <th>Section</th>
+            <th>Setting</th>
+        </tr>
+        {% for name,path in paths %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ path }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <h3>Settings</h3>
+    <table class="dataTable">
+        <tr>
+            <th>Section</th>
+            <th>Setting</th>
+            <th>Global</th>
+            <th>Common</th>
+            <th>Local</th>
+            <th>Used</th>
+            <th>Recommended</th>
+        </tr>
+        
+        {% for section,settings in results %}
+            
+            {% for setting in settings %}
+                <tr>
+                    <td>{{ setting.section }}</td>
+                    <td>{{ setting.setting }}</td>
+                    <td>{{ setting.global }}</td>
+                    <td>{{ setting.common }}</td>
+                    <td>{{ setting.local }}</td>
+                    
+                    {% set color %}
+                        {% if setting.used != setting.recommended %}
+                            background-color: red;
+                        {% endif %}
+                    {% endset %}
+                    
+                    <td style="{{ color }}">{{ setting.used }}</td>
+                    
+                     {% set color %}
+                        {% if setting.used != setting.recommended %}
+                            background-color: green;
+                        {% endif %}
+                    {% endset %}
+                    <td style="{{ color }}">{{ setting.recommended }}</td>
+                </tr>
+            {% endfor %}
+           
+        {% endfor %}
+        
+     </table>
+    
+    <h3>Plugins</h3>
+    <table class="dataTable">
+        <tr>
+            <th>Name</th>
+            <th>Is installed?</th>
+            <th>Real</th>
+            <th>Recommended</th>
+        </tr>
+            
+        {% for plugin in plugins %}
+            <tr>
+                <td>{{ plugin.name }}</td>
+                <td>{{ plugin.isInstalled }}</td>
+                
+                {% set color %}
+                    {% if plugin.current != plugin.recommended %}
+                        background-color: red;
+                    {% endif %}
+                {% endset %}
+                <td style="{{ color }}">{{ plugin.current }}</td>
+                
+                 {% set color %}
+                    {% if plugin.current != plugin.recommended %}
+                        background-color: green;
+                    {% endif %}
+                {% endset %}
+                <td style="{{ color }}">{{ plugin.recommended }}</td>
+            </tr>
+            
+        {% endfor %}
+    </table>
+
+{% endblock %}
