@@ -38,13 +38,37 @@ class Controller extends ControllerAdmin
     {
         $config = Config::getInstance();
         
+        $globalConfig = $config->getFromGlobalConfig($section);
+        $commonConfig = $config->getFromCommonConfig($section);
+        $localConfig = $config->getFromLocalConfig($section);
+        
+        $global = '';
+        if(isset($globalConfig[$setting])){
+            $global = $globalConfig[$setting];
+        }
+        
+        $common = '';
+        if(isset($commonConfig[$setting])){
+            $common = $commonConfig[$setting];
+        }
+        
+        $local = '';
+        if(isset($localConfig[$setting])){
+            $local = $localConfig[$setting];
+        }
+        
+        $used = '';
+        if(isset($config->{$section}[$setting])){
+            $used = $config->{$section}[$setting];
+        }
+        
         $result = [
             'section' => $section,
             'setting' => $setting,
-            'global' => $config->getFromGlobalConfig($section)[$setting],
-            'common' => $config->getFromCommonConfig($section)[$setting],
-            'local' => $config->getFromLocalConfig($section)[$setting],
-            'used' => $config->{$section}[$setting],
+            'global' => $global,
+            'common' => $common,
+            'local' => $local,
+            'used' => $used,
             'recommended' => $recommended,
             'type' => $type,
             'link' => $link,
@@ -62,11 +86,9 @@ class Controller extends ControllerAdmin
 
     /**
      *
-     * @param string $name            
-     * @param string $recommendEnable            
      * @return array
      */
-    private function getPlugins($name, $recommendEnable = true)
+    private function getPlugins()
     {
         $config = Config::getInstance();
         $activePlugins = $config->{'Plugins'}['Plugins'];
