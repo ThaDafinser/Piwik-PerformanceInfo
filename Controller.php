@@ -9,30 +9,32 @@ use Piwik\Plugin\ControllerAdmin;
 class Controller extends ControllerAdmin
 {
 
-	private $plugins = [
-	    'ExampleAPI' => 'disabled',
-	    'ExampleCommand' => 'disabled',
-	    'ExamplePlugin' => 'disabled',
-	    
-	    'ExampleReport' => 'disabled',
-	    'ExampleRssWidget' => 'disabled',
-	    'ExampleSettingsPlugin' => 'disabled',
-	    
-	    'ExampleTracker' => 'disabled',
-		'ExampleUI' => 'disabled',
-		'ExampleVisualization' => 'disabled',
+    const PIWIK_GITHUB = 'https://github.com/piwik/piwik/tree/8914e371016a98fd4883cbe1fbe7b1aa1827c540';
 
-		'Feedback' => 'disabled',
-
-		'RerUserDates' => 'enabled',
-		'SecurityInfo' => 'enabled'
-	];
+    private $plugins = [
+        'ExampleAPI' => 'disabled',
+        'ExampleCommand' => 'disabled',
+        'ExamplePlugin' => 'disabled',
+        
+        'ExampleReport' => 'disabled',
+        'ExampleRssWidget' => 'disabled',
+        'ExampleSettingsPlugin' => 'disabled',
+        
+        'ExampleTracker' => 'disabled',
+        'ExampleUI' => 'disabled',
+        'ExampleVisualization' => 'disabled',
+        
+        'Feedback' => 'disabled',
+        
+        'RerUserDates' => 'enabled',
+        'SecurityInfo' => 'enabled'
+    ];
 
     /**
      *
      * @return array
      */
-    private function getValues($section, $setting, $recommended)
+    private function getValues($section, $setting, $recommended, $type = '', $link = '', $description = '')
     {
         $config = Config::getInstance();
         
@@ -43,7 +45,10 @@ class Controller extends ControllerAdmin
             'common' => $config->getFromCommonConfig($section)[$setting],
             'local' => $config->getFromLocalConfig($section)[$setting],
             'used' => $config->{$section}[$setting],
-            'recommended' => $recommended
+            'recommended' => $recommended,
+            'type' => $type,
+            'link' => $link,
+            'description' => $description
         ];
         
         foreach ($result as &$val) {
@@ -55,33 +60,40 @@ class Controller extends ControllerAdmin
         return $result;
     }
 
-    private function getPlugins($name, $recommendEnable = true){
-		$config = Config::getInstance();
-		$activePlugins = $config->{'Plugins'}['Plugins'];
-		$installedPlugins = $config->{'PluginsInstalled'}['PluginsInstalled'];
-		
-		$pluginSuggestions = [];
-		foreach($this->plugins as $name => $suggestedMode){
-		   
-		    $realMode = 'disabled';
-		    if(in_array($name, $activePlugins)){
-		        $realMode = 'enabled';
-		    }
-		    
-		    $isInstalled = 'no';
-		    if(in_array($name, $installedPlugins)){
-		        $isInstalled = 'yes';
-		    }
-		    
-			$pluginSuggestions[] = [
-			    'name' => $name,
-			    'current' => $realMode,
+    /**
+     *
+     * @param string $name            
+     * @param string $recommendEnable            
+     * @return array
+     */
+    private function getPlugins($name, $recommendEnable = true)
+    {
+        $config = Config::getInstance();
+        $activePlugins = $config->{'Plugins'}['Plugins'];
+        $installedPlugins = $config->{'PluginsInstalled'}['PluginsInstalled'];
+        
+        $pluginSuggestions = [];
+        foreach ($this->plugins as $name => $suggestedMode) {
+            
+            $realMode = 'disabled';
+            if (in_array($name, $activePlugins)) {
+                $realMode = 'enabled';
+            }
+            
+            $isInstalled = 'no';
+            if (in_array($name, $installedPlugins)) {
+                $isInstalled = 'yes';
+            }
+            
+            $pluginSuggestions[] = [
+                'name' => $name,
+                'current' => $realMode,
                 'recommended' => $suggestedMode,
-			    'isInstalled' => $isInstalled
-			];
-		}
-		
-		return $pluginSuggestions;
+                'isInstalled' => $isInstalled
+            ];
+        }
+        
+        return $pluginSuggestions;
     }
 
     /**
@@ -90,87 +102,88 @@ class Controller extends ControllerAdmin
      */
     private function getResult()
     {
-        $result = [];
+        $configFile = self::PIWIK_GITHUB . '/config/global.ini.php';
         
+        $result = [];
         $result['log'] = [
-            $this->getValues('log', 'log_level', 'WARN')
+            $this->getValues('log', 'log_level', 'WARN', 'security')
         ];
         
         $result['Cache'] = [
-            $this->getValues('Cache', 'backend', 'chained')
+            $this->getValues('Cache', 'backend', 'chained', 'performance', $configFile . '#L73-L80')
         ];
         
         $result['ChainedCache'] = [
-            $this->getValues('ChainedCache', 'backends', 'array,redis,file')
+            $this->getValues('ChainedCache', 'backends', 'array,redis', 'performance', $configFile . '#L82-L86')
         ];
         
         $result['Debug'] = [
-            $this->getValues('Debug', 'always_archive_data_period', 0),
-            $this->getValues('Debug', 'always_archive_data_day', 0),
-            $this->getValues('Debug', 'always_archive_data_range', 0),
+            $this->getValues('Debug', 'always_archive_data_period', 0, 'performance'),
+            $this->getValues('Debug', 'always_archive_data_day', 0, 'performance'),
+            $this->getValues('Debug', 'always_archive_data_range', 0, 'performance'),
             
-            $this->getValues('Debug', 'enable_sql_profiler', 0),
-            $this->getValues('Debug', 'enable_measure_piwik_usage_in_idsite', 0),
+            $this->getValues('Debug', 'enable_sql_profiler', 0, 'performance'),
+            $this->getValues('Debug', 'enable_measure_piwik_usage_in_idsite', 0, '', $configFile . '#L111-L114'),
             
-            $this->getValues('Debug', 'tracker_always_new_visitor', 0),
-            $this->getValues('Debug', 'allow_upgrades_to_beta', 0)
+            $this->getValues('Debug', 'tracker_always_new_visitor', 0, '', $configFile . '#L116-L117'),
+            $this->getValues('Debug', 'allow_upgrades_to_beta', 0, 'security', $configFile . '#L119-L120', 'Beta releases may have bugs')
         ];
         
         $result['DebugTests'] = [
-            $this->getValues('Debug', 'enable_load_standalone_plugins_during_tests', 0),
+            $this->getValues('Debug', 'enable_load_standalone_plugins_during_tests', 0, '', $configFile . '#L123-L125')
         ];
         
         $result['DebugTests'] = [
-            $this->getValues('DebugTests', 'enable_load_standalone_plugins_during_tests', 0),
+            $this->getValues('DebugTests', 'enable_load_standalone_plugins_during_tests', 0)
         ];
         
         $result['Development'] = [
-            $this->getValues('Development', 'enabled', 0),
-            $this->getValues('Development', 'disable_merged_assets', 0),
+            $this->getValues('Development', 'enabled', 0, 'security'),
+            $this->getValues('Development', 'disable_merged_assets', 0, 'performance')
         ];
         
         $result['General'] = [
-            $this->getValues('General', 'enable_processing_unique_visitors_day', 1),
-            $this->getValues('General', 'enable_processing_unique_visitors_week', 1),
-            $this->getValues('General', 'enable_processing_unique_visitors_month', 1),
-            $this->getValues('General', 'enable_processing_unique_visitors_year', 0),
-            $this->getValues('General', 'enable_processing_unique_visitors_range', 0),
+            $this->getValues('General', 'enable_processing_unique_visitors_day', 1, 'performance'),
+            $this->getValues('General', 'enable_processing_unique_visitors_week', 1, 'performance'),
+            $this->getValues('General', 'enable_processing_unique_visitors_month', 1, 'performance'),
+            $this->getValues('General', 'enable_processing_unique_visitors_year', 0, 'performance'),
+            $this->getValues('General', 'enable_processing_unique_visitors_range', 0, 'performance'),
             
-            $this->getValues('General', 'enabled_periods_UI', 'day,week,month,year'),
-            $this->getValues('General', 'enabled_periods_API', 'day,week,month,year'),
+            $this->getValues('General', 'enabled_periods_UI', 'day,week,month,year', 'performance'),
+            $this->getValues('General', 'enabled_periods_API', 'day,week,month,year', 'performance'),
             
-            $this->getValues('General', 'maintenance_mode', 0),
+            $this->getValues('General', 'maintenance_mode', 0, '', $configFile . '#L161-L163'),
             
-            $this->getValues('General', 'action_category_level_limit', 3),
+            $this->getValues('General', 'action_category_level_limit', 3, 'performance'),
             
-            $this->getValues('General', 'show_multisites_sparklines', 0),
+            $this->getValues('General', 'show_multisites_sparklines', 0, 'performance'),
             
-            $this->getValues('General', 'anonymous_user_enable_use_segments_API', 0),
+            $this->getValues('General', 'anonymous_user_enable_use_segments_API', 0, 'security'),
             
             $this->getValues('General', 'browser_archiving_disabled_enforce', 1),
             
             $this->getValues('General', 'enable_create_realtime_segments', 0),
             $this->getValues('General', 'enable_segment_suggested_values', 0),
-            $this->getValues('General', 'adding_segment_requires_access', 'superuser'),
-            $this->getValues('General', 'allow_adding_segments_for_all_websites', 0),
+            $this->getValues('General', 'adding_segment_requires_access', 'superuser', 'performance'),
+            $this->getValues('General', 'allow_adding_segments_for_all_websites', 0, 'performance'),
             
-            $this->getValues('General', 'datatable_row_limits', '5,10,25,50'),
+            $this->getValues('General', 'datatable_row_limits', '5,10,25,50', 'performance'),
             
-            $this->getValues('General', 'default_day', 'yesterday'),
-            $this->getValues('General', 'default_period', 'day'),
+            $this->getValues('General', 'default_day', 'yesterday', 'performance'),
+            $this->getValues('General', 'default_period', 'day', 'performance'),
             
-            $this->getValues('General', 'enable_browser_archiving_triggering', 0),
+            $this->getValues('General', 'enable_browser_archiving_triggering', 0, 'performance'),
             
-            $this->getValues('General', 'force_ssl', 1),
+            $this->getValues('General', 'force_ssl', 1, 'security', $configFile . '#L306-L310', 'https is always better than http'),
             
-            $this->getValues('General', 'live_widget_refresh_after_seconds', 30),
+            $this->getValues('General', 'live_widget_refresh_after_seconds', 30, 'performance', $configFile . '#L399-L401'),
             
-            $this->getValues('General', 'multisites_refresh_after_seconds', 0),
+            $this->getValues('General', 'multisites_refresh_after_seconds', 0, 'performance'),
             
             $this->getValues('General', 'enable_delete_old_data_settings_admin', 0),
             
-            $this->getValues('General', 'enable_auto_update', 0),
-            $this->getValues('General', 'enable_update_communication', 1),
+            $this->getValues('General', 'enable_auto_update', 0, 'security', $configFile . '#L527-L528', 'Package are currently not verified/checked'),
+            $this->getValues('General', 'enable_update_communication', 1, 'security', $configFile . '#L530-L532', 'Get an email when updates are available')
         ];
         
         /*
@@ -181,12 +194,11 @@ class Controller extends ControllerAdmin
             $this->getValues('Tracker', 'new_visit_api_requires_admin', 0),
             $this->getValues('Tracker', 'debug', 0),
             
-            $this->getValues('Tracker', 'tracking_requests_require_authentication', 1),
-            
+            $this->getValues('Tracker', 'tracking_requests_require_authentication', 1, 'security', $configFile . '#L651-L656')
         ];
         
         $result['Deletelogs'] = [
-            $this->getValues('Deletelogs', 'delete_logs_enable', 0),
+            $this->getValues('Deletelogs', 'delete_logs_enable', 0)
         ];
         
         return $result;
@@ -206,7 +218,7 @@ class Controller extends ControllerAdmin
             'local' => $config->getLocalConfigPath()
         ];
         $view->results = $this->getResult();
-		$view->plugins = $this->getPlugins();
+        $view->plugins = $this->getPlugins();
         
         return $view->render();
     }
