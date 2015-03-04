@@ -28,6 +28,9 @@
             <th>Local</th>
             <th>Used</th>
             <th>Recommended</th>
+            <th>Type</th>
+            <th>Link</th>
+            <th>Description</th>
         </tr>
         
         {% for section,settings in results %}
@@ -54,6 +57,13 @@
                         {% endif %}
                     {% endset %}
                     <td style="{{ color }}">{{ setting.recommended }}</td>
+                    
+                    <td>{{ setting.type }}</td>
+                    {% if setting.link != '' %}
+                        <td><a href="{{ setting.link }}">View</a></td>
+                    {% endif %}
+                    
+                    <td>{{ setting.description }}</td>
                 </tr>
             {% endfor %}
            
