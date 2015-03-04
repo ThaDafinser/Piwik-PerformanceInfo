@@ -104,9 +104,10 @@ class Controller extends ControllerAdmin
     {
         $configFile = self::PIWIK_GITHUB . '/config/global.ini.php';
         
+        // , $configFile . ''
         $result = [];
         $result['log'] = [
-            $this->getValues('log', 'log_level', 'WARN', 'security')
+            $this->getValues('log', 'log_level', 'WARN', 'security', $configFile . '#L65-L68')
         ];
         
         $result['Cache'] = [
@@ -118,11 +119,11 @@ class Controller extends ControllerAdmin
         ];
         
         $result['Debug'] = [
-            $this->getValues('Debug', 'always_archive_data_period', 0, 'performance'),
-            $this->getValues('Debug', 'always_archive_data_day', 0, 'performance'),
-            $this->getValues('Debug', 'always_archive_data_range', 0, 'performance'),
+            $this->getValues('Debug', 'always_archive_data_period', 0, 'performance', $configFile . '#L99-L101'),
+            $this->getValues('Debug', 'always_archive_data_day', 0, 'performance', $configFile . '#L102'),
+            $this->getValues('Debug', 'always_archive_data_range', 0, 'performance', $configFile . '#L103-L104'),
             
-            $this->getValues('Debug', 'enable_sql_profiler', 0, 'performance'),
+            $this->getValues('Debug', 'enable_sql_profiler', 0, 'performance', $configFile . '#L106-L109'),
             $this->getValues('Debug', 'enable_measure_piwik_usage_in_idsite', 0, '', $configFile . '#L111-L114'),
             
             $this->getValues('Debug', 'tracker_always_new_visitor', 0, '', $configFile . '#L116-L117'),
@@ -134,53 +135,53 @@ class Controller extends ControllerAdmin
         ];
         
         $result['DebugTests'] = [
-            $this->getValues('DebugTests', 'enable_load_standalone_plugins_during_tests', 0)
+            $this->getValues('DebugTests', 'enable_load_standalone_plugins_during_tests', 0, '', $configFile . '#L123-L125')
         ];
         
         $result['Development'] = [
-            $this->getValues('Development', 'enabled', 0, 'security'),
-            $this->getValues('Development', 'disable_merged_assets', 0, 'performance')
+            $this->getValues('Development', 'enabled', 0, 'security', $configFile . '#L128-L132'),
+            $this->getValues('Development', 'disable_merged_assets', 0, 'performance', $configFile . '#L134-L136')
         ];
         
         $result['General'] = [
-            $this->getValues('General', 'enable_processing_unique_visitors_day', 1, 'performance'),
-            $this->getValues('General', 'enable_processing_unique_visitors_week', 1, 'performance'),
-            $this->getValues('General', 'enable_processing_unique_visitors_month', 1, 'performance'),
-            $this->getValues('General', 'enable_processing_unique_visitors_year', 0, 'performance'),
-            $this->getValues('General', 'enable_processing_unique_visitors_range', 0, 'performance'),
+            $this->getValues('General', 'enable_processing_unique_visitors_day', 1, 'performance', $configFile . '#L140-L148'),
+            $this->getValues('General', 'enable_processing_unique_visitors_week', 1, 'performance', $configFile . '#L140-L148'),
+            $this->getValues('General', 'enable_processing_unique_visitors_month', 1, 'performance', $configFile . '#L140-L148'),
+            $this->getValues('General', 'enable_processing_unique_visitors_year', 0, 'performance', $configFile . '#L140-L148'),
+            $this->getValues('General', 'enable_processing_unique_visitors_range', 0, 'performance', $configFile . '#L140-L148'),
             
-            $this->getValues('General', 'enabled_periods_UI', 'day,week,month,year', 'performance'),
-            $this->getValues('General', 'enabled_periods_API', 'day,week,month,year', 'performance'),
+            $this->getValues('General', 'enabled_periods_UI', 'day,week,month,year', 'performance', $configFile . '#L155-L159'),
+            $this->getValues('General', 'enabled_periods_API', 'day,week,month,year', 'performance', $configFile . '#L155-L159'),
             
             $this->getValues('General', 'maintenance_mode', 0, '', $configFile . '#L161-L163'),
             
-            $this->getValues('General', 'action_category_level_limit', 3, 'performance'),
+            $this->getValues('General', 'action_category_level_limit', 3, 'performance', $configFile . '#L173-L176', 'Many actions lead to many entries in the archives ( = more space and more time for loading data)'),
             
-            $this->getValues('General', 'show_multisites_sparklines', 0, 'performance'),
+            $this->getValues('General', 'show_multisites_sparklines', 0, 'performance', $configFile . '#L184-L185'),
             
-            $this->getValues('General', 'anonymous_user_enable_use_segments_API', 0, 'security'),
+            $this->getValues('General', 'anonymous_user_enable_use_segments_API', 0, 'security', $configFile . '#L190-L192'),
             
-            $this->getValues('General', 'browser_archiving_disabled_enforce', 1),
+            $this->getValues('General', 'browser_archiving_disabled_enforce', 1, '', $configFile . '#L194-L197'),
             
-            $this->getValues('General', 'enable_create_realtime_segments', 0),
-            $this->getValues('General', 'enable_segment_suggested_values', 0),
-            $this->getValues('General', 'adding_segment_requires_access', 'superuser', 'performance'),
-            $this->getValues('General', 'allow_adding_segments_for_all_websites', 0, 'performance'),
+            $this->getValues('General', 'enable_create_realtime_segments', 0, '', $configFile . '#L199-L206'),
+            $this->getValues('General', 'enable_segment_suggested_values', 0, '', $configFile . '#L208-L210'),
+            $this->getValues('General', 'adding_segment_requires_access', 'superuser', 'performance', $configFile . '#L212-L216'),
+            $this->getValues('General', 'allow_adding_segments_for_all_websites', 0, 'performance', $configFile . '#L218-L221'),
             
-            $this->getValues('General', 'datatable_row_limits', '5,10,25,50', 'performance'),
+            $this->getValues('General', 'datatable_row_limits', '5,10,25,50', 'performance', $configFile . '#L234-L236', 'Listing 500 entries could blow up your browser or you might run in a timeout'),
             
-            $this->getValues('General', 'default_day', 'yesterday', 'performance'),
-            $this->getValues('General', 'default_period', 'day', 'performance'),
+            $this->getValues('General', 'default_day', 'yesterday', 'performance', $configFile . '#L248-L250'),
+            $this->getValues('General', 'default_period', 'day', 'performance', $configFile . '#L251-L252'),
             
-            $this->getValues('General', 'enable_browser_archiving_triggering', 0, 'performance'),
+            $this->getValues('General', 'enable_browser_archiving_triggering', 0, 'performance', $configFile . '#L259-L262'),
             
             $this->getValues('General', 'force_ssl', 1, 'security', $configFile . '#L306-L310', 'https is always better than http'),
             
             $this->getValues('General', 'live_widget_refresh_after_seconds', 30, 'performance', $configFile . '#L399-L401'),
             
-            $this->getValues('General', 'multisites_refresh_after_seconds', 0, 'performance'),
+            $this->getValues('General', 'multisites_refresh_after_seconds', 0, 'performance', $configFile . '#L408-L410'),
             
-            $this->getValues('General', 'enable_delete_old_data_settings_admin', 0),
+            $this->getValues('General', 'enable_delete_old_data_settings_admin', 0, '', $configFile . '#L517-L519'),
             
             $this->getValues('General', 'enable_auto_update', 0, 'security', $configFile . '#L527-L528', 'Package are currently not verified/checked'),
             $this->getValues('General', 'enable_update_communication', 1, 'security', $configFile . '#L530-L532', 'Get an email when updates are available')
@@ -190,15 +191,15 @@ class Controller extends ControllerAdmin
          * Tracker
          */
         $result['Tracker'] = [
-            $this->getValues('Tracker', 'enable_fingerprinting_across_websites', 0),
-            $this->getValues('Tracker', 'new_visit_api_requires_admin', 0),
-            $this->getValues('Tracker', 'debug', 0),
+            $this->getValues('Tracker', 'enable_fingerprinting_across_websites', 0, '', $configFile . '#L547-L551'),
+            $this->getValues('Tracker', 'new_visit_api_requires_admin', 0, ''),
+            $this->getValues('Tracker', 'debug', 0, '', $configFile . '#L558-L560'),
             
             $this->getValues('Tracker', 'tracking_requests_require_authentication', 1, 'security', $configFile . '#L651-L656')
         ];
         
         $result['Deletelogs'] = [
-            $this->getValues('Deletelogs', 'delete_logs_enable', 0)
+            $this->getValues('Deletelogs', 'delete_logs_enable', 0, '', $configFile . '#L672-L676')
         ];
         
         return $result;
