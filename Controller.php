@@ -26,7 +26,6 @@ class Controller extends ControllerAdmin
         
         'Feedback' => 'disabled',
         
-        'RerUserDates' => 'enabled',
         'SecurityInfo' => 'enabled'
     ];
 
