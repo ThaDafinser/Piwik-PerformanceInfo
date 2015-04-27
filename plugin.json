@@ -1,6 +1,6 @@
 {
   "name": "PerformanceInfo",
-  "version": "v0.2.0",
+  "version": "v0.2.1",
   "description": "Piwik plugin to check if the settings are good for security/performance",
   "keywords": ["config", "configuration", "performance", "security", "optimization", "ThaDafinser"],
   "license": "GPL v3",
