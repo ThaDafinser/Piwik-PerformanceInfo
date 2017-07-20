@@ -10,9 +10,16 @@ class Menu extends PluginMenu
 
     public function configureAdminMenu(MenuAdmin $menu)
     {
-        $menu->add('CoreAdminHome_MenuDiagnostic', 'Performance & Security', array(
-            'module' => 'PerformanceInfo',
-            'action' => 'index'
-        ), Piwik::hasUserSuperUserAccess(), $order = 8);
+         if (! Piwik::isUserHasSomeAdminAccess()) {
+            return;
+        }
+
+        $menu->addDiagnosticItem(
+            'Performance Info',
+            array(
+                'module' => 'PerformanceInfo',
+                'action' => 'index'
+            ),
+            $order = 100);
     }
 }
