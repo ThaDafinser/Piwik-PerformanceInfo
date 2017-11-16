@@ -206,6 +206,7 @@ class Controller extends ControllerAdmin
             
             $this->getValues('General', 'enable_auto_update', 0, 'security', $configFile . '#L527-L528', 'Package are currently not verified/checked'),
             $this->getValues('General', 'enable_update_communication', 1, 'security', $configFile . '#L530-L532', 'Get an email when updates are available')
+            $this->getValues('General', 'enable_internet_features', 0, 'security', $configFile . '#L585-L587', 'Turn of any internet communication')
         ];
         
         /*
